@@ -1,24 +1,15 @@
 package dev.borriguel.desafiobackendbanco.model
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.OneToOne
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Table
 
-@Entity
+@Table(name = "clients")
 data class Client(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     val id: Long? = null,
-    @Column(nullable = false, unique = true)
     private var email: String,
-    @Column(nullable = false)
     private var password: String,
-    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, optional = false)
-    private val wallet: Wallet
+    private var walletId: Long
 ) {
     init {
         validateEmail(email)
@@ -26,7 +17,11 @@ data class Client(
     }
 
     fun getEmail(): String = email
-    fun getWallet(): Wallet = wallet
+    fun getWallet(): Long = walletId
+
+    fun setWallet(walletId: Long) {
+        this.walletId = walletId
+    }
 
     fun changeEmail(newEmail: String) {
         validateEmail(newEmail)

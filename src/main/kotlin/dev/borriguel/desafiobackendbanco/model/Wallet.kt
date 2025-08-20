@@ -1,19 +1,14 @@
 package dev.borriguel.desafiobackendbanco.model
 
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Table
 import java.math.BigDecimal
 
-@Entity
+@Table(name = "wallets")
 data class Wallet(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     val id: Long? = null,
     private var balance: BigDecimal = BigDecimal.ZERO,
-    @Enumerated(EnumType.STRING)
     private val type: AccountType
 ) {
     init {
