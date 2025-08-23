@@ -20,13 +20,13 @@ data class Wallet(
 
     fun deposit(amount: BigDecimal) {
         validateAmount(amount)
-        balance.add(amount)
+        balance = balance.add(amount)
     }
 
     fun withdraw(amount: BigDecimal) {
         validateAmount(amount)
         if (!hasSufficientBalance(amount)) throw IllegalArgumentException("Insufficient balance")
-        balance.subtract(amount)
+        balance = balance.subtract(amount)
     }
 
     fun transferTo(targetWallet: Wallet, amount: BigDecimal) {
