@@ -19,7 +19,7 @@ class ClientService(private val repository: ClientRepository, private val wallet
         return repository.save(client)
     }
 
-    suspend fun getById(id: Long): Client? {
+    suspend fun getById(id: Long): Client {
         return repository.findById(id) ?: throw IllegalArgumentException("Client not found")
     }
 
@@ -41,7 +41,7 @@ class ClientService(private val repository: ClientRepository, private val wallet
     }
 
     suspend fun updateById(id: Long, clientUpdate: ClientDto): Client {
-        val existingClient = getById(id) ?: throw IllegalArgumentException("Client not found")
+        val existingClient = getById(id)
         existingClient.changeEmail(clientUpdate.email)
         existingClient.changePassword(clientUpdate.password)
         return repository.save(existingClient)

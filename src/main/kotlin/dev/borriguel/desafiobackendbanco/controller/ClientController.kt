@@ -25,7 +25,7 @@ class ClientController(private val service: ClientService) {
     }
 
     @GetMapping("/{id}")
-    suspend fun getById(@PathVariable id : Long) : Client? {
+    suspend fun getById(@PathVariable id : Long) : Client {
         return service.getById(id)
     }
 
