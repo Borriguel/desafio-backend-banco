@@ -1,6 +1,7 @@
 package dev.borriguel.desafiobackendbanco.model
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -11,7 +12,9 @@ data class Transaction private constructor(
     val id: Long? = null,
     private val payerId: Long,
     private val payeeId: Long,
+    @Column("transaction_value")
     private val value: BigDecimal,
+    @Column("idempotency_key")
     private val idempotencyKey: String,
     private var status: Status,
     private val createdAt: LocalDateTime = LocalDateTime.now(),
