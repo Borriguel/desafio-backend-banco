@@ -32,4 +32,8 @@ class WalletService(private val repository: WalletRepository) {
         return wallet
     }
 
+    suspend fun update(wallet: Wallet) {
+        repository.save(wallet)
+    }
+
 }
