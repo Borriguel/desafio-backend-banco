@@ -11,4 +11,7 @@ data class TransactionDto(
     @field:DecimalMin(value = "0.01", message = "Value must be greater than zero")
     val value: BigDecimal,
     @field:NotNull(message = "Payee cannot be null")
-    val payeeId: Long)
+    val payeeId: Long,
+    @field:NotNull(message = "Idempotency key cannot be null")
+    val idempotencyKey: String
+)
