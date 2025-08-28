@@ -31,7 +31,7 @@ class TransactionService(
         payer.validateShopkeeperTransaction()
         walletService.getById(payeeId)
         val transaction = Transaction.create(payerId, payeeId, value, idempotencyKey)
-        logger.info("Created transaction ${transaction.getPayeeId()} -> ${transaction.getPayerId()} with value ${transaction.getValue()}")
+        logger.info("Created transaction ${transaction.getPayerId()} -> ${transaction.getPayeeId()} with value ${transaction.getValue()}")
         return repository.save(transaction)
     }
 
