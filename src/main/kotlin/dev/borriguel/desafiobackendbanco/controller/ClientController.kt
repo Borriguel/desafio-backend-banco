@@ -21,7 +21,7 @@ class ClientController(private val service: ClientService) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun create(@Valid @RequestBody clientDto: ClientDto) : Client {
-        val client = service.createClient(clientDto.email, clientDto.password, clientDto.accountType)
+        val client = service.createClient(clientDto.email, clientDto.password, clientDto.name, clientDto.document, clientDto.accountType)
         return client
     }
 
