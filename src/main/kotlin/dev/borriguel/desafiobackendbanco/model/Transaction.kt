@@ -39,7 +39,7 @@ data class Transaction private constructor(
     }
 
     fun authorize() {
-        ensureStatus(Status.CREATED)
+        ensureStatus(Status.PROCESSING)
         status = Status.AUTHORIZED
         authorizedAt = LocalDateTime.now()
     }
@@ -51,7 +51,7 @@ data class Transaction private constructor(
     }
 
     fun fail() {
-        ensureStatus(Status.CREATED)
+        ensureStatus(Status.PROCESSING)
         status = Status.FAILED
         failedAt = LocalDateTime.now()
     }
