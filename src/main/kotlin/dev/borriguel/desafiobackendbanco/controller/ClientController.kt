@@ -3,6 +3,7 @@ package dev.borriguel.desafiobackendbanco.controller
 import dev.borriguel.desafiobackendbanco.dto.ClientDto
 import dev.borriguel.desafiobackendbanco.model.Client
 import dev.borriguel.desafiobackendbanco.service.ClientService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 class ClientController(private val service: ClientService) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun create(@RequestBody clientDto: ClientDto) : Client {
+    suspend fun create(@Valid @RequestBody clientDto: ClientDto) : Client {
         val client = service.createClient(clientDto.email, clientDto.password, clientDto.accountType)
         return client
     }
@@ -41,7 +42,7 @@ class ClientController(private val service: ClientService) {
     }
 
     @PutMapping("/{id}")
-    suspend fun updateById(@PathVariable id: Long, @RequestBody clientUpdate: ClientDto): Client {
+    suspend fun updateById(@PathVariable id: Long, @Valid @RequestBody clientUpdate: ClientDto): Client {
         return service.updateById(id, clientUpdate)
     }
 
