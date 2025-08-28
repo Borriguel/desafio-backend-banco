@@ -31,9 +31,13 @@ data class Wallet(
     }
 
     fun transferTo(targetWallet: Wallet, amount: BigDecimal) {
-        if (type == AccountType.SHOPKEEPER) throw IllegalArgumentException("Shopkeeper account cannot do transactions")
+        validateShopkeeperTransaction()
         withdraw(amount)
         targetWallet.deposit(amount)
+    }
+
+    fun validateShopkeeperTransaction() {
+        if (type == AccountType.SHOPKEEPER) throw IllegalArgumentException("Shopkeeper account cannot do transactions")
     }
 
     private fun validateAmount(amount: BigDecimal) {
