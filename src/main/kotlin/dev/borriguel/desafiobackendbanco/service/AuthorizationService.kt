@@ -16,7 +16,7 @@ class AuthorizationService(private val webClient: WebClient) {
                 .retrieve()
                 .awaitBody<AuthorizationDto>()
             response.data.authorization
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
