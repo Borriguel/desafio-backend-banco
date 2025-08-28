@@ -1,5 +1,6 @@
 package dev.borriguel.desafiobackendbanco.model
 
+import dev.borriguel.desafiobackendbanco.exception.InsufficientFundsException
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.math.BigDecimal
@@ -25,7 +26,7 @@ data class Wallet(
 
     fun withdraw(amount: BigDecimal) {
         validateAmount(amount)
-        if (!hasSufficientBalance(amount)) throw IllegalArgumentException("Insufficient balance")
+        if (!hasSufficientBalance(amount)) throw InsufficientFundsException("Insufficient balance")
         balance = balance.subtract(amount)
     }
 
