@@ -4,10 +4,12 @@ import dev.borriguel.desafiobackendbanco.model.AccountType
 import dev.borriguel.desafiobackendbanco.model.Wallet
 import dev.borriguel.desafiobackendbanco.repository.WalletRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 
 @Service
 class WalletService(private val repository: WalletRepository) {
+    @Transactional
     suspend fun createWallet(accountType: AccountType) : Wallet {
         return repository.save(Wallet(
             type = accountType
@@ -18,6 +20,7 @@ class WalletService(private val repository: WalletRepository) {
         return repository.findById(id) ?: throw IllegalArgumentException("Wallet not found")
     }
 
+    @Transactional
     suspend fun depositById(id: Long, amount: BigDecimal) : Wallet {
         val wallet = getById(id)
         wallet.deposit(amount)
@@ -25,6 +28,7 @@ class WalletService(private val repository: WalletRepository) {
         return wallet
     }
 
+    @Transactional
     suspend fun withdrawById(id: Long, amount: BigDecimal) : Wallet {
         val wallet = getById(id)
         wallet.withdraw(amount)
@@ -32,8 +36,9 @@ class WalletService(private val repository: WalletRepository) {
         return wallet
     }
 
-    suspend fun update(wallet: Wallet) {
-        repository.save(wallet)
+    @Transactional
+    suspend fun updateBoth(payer: Wallet, payee: Wallet) {
+        repository.save(payer)
+        repository.save(payee)
     }
-
 }
