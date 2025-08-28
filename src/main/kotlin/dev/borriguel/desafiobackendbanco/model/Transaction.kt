@@ -18,6 +18,7 @@ data class Transaction private constructor(
     private val idempotencyKey: String,
     private var status: Status,
     private val createdAt: LocalDateTime = LocalDateTime.now(),
+    private var proccessingAt: LocalDateTime? = null,
     private var authorizedAt: LocalDateTime? = null,
     private var failedAt: LocalDateTime? = null
 ) {
@@ -43,6 +44,12 @@ data class Transaction private constructor(
         authorizedAt = LocalDateTime.now()
     }
 
+    fun process() {
+        ensureStatus(Status.CREATED)
+        status = Status.PROCESSING
+        proccessingAt = LocalDateTime.now()
+    }
+
     fun fail() {
         ensureStatus(Status.CREATED)
         status = Status.FAILED
@@ -60,5 +67,6 @@ data class Transaction private constructor(
     fun getStatus(): Status = status
     fun getCreatedAt(): LocalDateTime = createdAt
     fun getAuthorizedAt(): LocalDateTime? = authorizedAt
+    fun getProccessingAt(): LocalDateTime? = proccessingAt
     fun getFailedAt(): LocalDateTime? = failedAt
 }
