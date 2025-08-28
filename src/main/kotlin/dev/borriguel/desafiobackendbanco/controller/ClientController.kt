@@ -1,6 +1,7 @@
 package dev.borriguel.desafiobackendbanco.controller
 
 import dev.borriguel.desafiobackendbanco.dto.ClientDto
+import dev.borriguel.desafiobackendbanco.dto.ClientWalletDto
 import dev.borriguel.desafiobackendbanco.model.Client
 import dev.borriguel.desafiobackendbanco.service.ClientService
 import jakarta.validation.Valid
@@ -28,6 +29,11 @@ class ClientController(private val service: ClientService) {
     @GetMapping("/{id}")
     suspend fun getById(@PathVariable id : Long) : Client {
         return service.getById(id)
+    }
+
+    @GetMapping("/details/{id}")
+    suspend fun getDetailsById(@PathVariable id : Long) : ClientWalletDto {
+        return service.getDetailsById(id)
     }
 
     @GetMapping

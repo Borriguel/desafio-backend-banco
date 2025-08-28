@@ -1,6 +1,7 @@
 package dev.borriguel.desafiobackendbanco.service
 
 import dev.borriguel.desafiobackendbanco.dto.ClientDto
+import dev.borriguel.desafiobackendbanco.dto.ClientWalletDto
 import dev.borriguel.desafiobackendbanco.model.AccountType
 import dev.borriguel.desafiobackendbanco.model.Client
 import dev.borriguel.desafiobackendbanco.repository.ClientRepository
@@ -28,10 +29,6 @@ class ClientService(private val repository: ClientRepository, private val wallet
 
     suspend fun getById(id: Long): Client {
         return repository.findById(id) ?: throw IllegalArgumentException("Client not found")
-    }
-
-    suspend fun getByEmail(email: String): Client? {
-        return repository.findByEmail(email) ?: throw IllegalArgumentException("Client not found")
     }
 
     private suspend fun existsByEmail(email: String): Boolean {
@@ -63,6 +60,18 @@ class ClientService(private val repository: ClientRepository, private val wallet
         existingClient.changeDocument(clientUpdate.document)
         existingClient.changePassword(clientUpdate.password)
         return repository.save(existingClient)
+    }
+
+    suspend fun getDetailsById(id: Long): ClientWalletDto {
+        val client = getById(id)
+        val wallet = walletService.getById(client.getWallet())
+        val clientDetails = ClientWalletDto(
+            id,
+            client.getName(),
+            client.getDocument(),
+            wallet
+        )
+        return clientDetails
     }
 
 }

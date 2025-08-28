@@ -29,7 +29,7 @@ data class ClientDto(
 )
 
 data class ClientWalletDto(
-    val id: String,
+    val id: Long,
     val name: String,
     val document: String,
     val wallet: Wallet
