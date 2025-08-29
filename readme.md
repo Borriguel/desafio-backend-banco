@@ -1,183 +1,401 @@
-# Desafio Back-end PicPay
+# Desafio Backend Banco
 
-Primeiramente, obrigado pelo seu interesse em trabalhar na melhor plataforma de pagamentos do mundo!
-Abaixo você encontrará todos as informações necessárias para iniciar o seu teste.
+Este é um projeto de backend para um sistema bancário desenvolvido em Kotlin com Spring Boot. O sistema permite gerenciar clientes, carteiras e transações financeiras entre eles.
 
-## Avisos antes de começar
+Link do desafio: https://github.com/PicPay/picpay-desafio-backend
 
-- Leia com atenção este documento todo e tente seguir ao **máximo** as instruções;
-- Crie um repositório no seu GitHub **sem citar nada relacionado ao PicPay**;
-- Faça seus commits no seu repositório;
-- Envie o link do seu repositório para o email **do recrutador responsável**;
-- Você poderá consultar o Google, Stackoverflow ou algum projeto particular na sua máquina;
-- Dê uma olhada nos [Materiais úteis](#materiais-úteis);
-- Dê uma olhada em como será a [entrevista](#para-o-dia-da-entrevista-técnica);
-- Fique à vontade para perguntar qualquer dúvida aos recrutadores;
-- Fique tranquilo, respire, assim como você, também já passamos por essa etapa. Boa sorte! :)
+## Sumário
 
-_Corpo do Email com o link do repositório do desafio_
+- [Tecnologias](#tecnologias)
+- [Como Executar](#como-executar)
+- [Modelos de Domínio](#modelos-de-domínio)
+- [Regras de Negócio](#regras-de-negócio)
+- [Rotas da API](#rotas-da-api)
+  - [Clientes](#clientes)
+  - [Carteiras](#carteiras)
+  - [Transações](#transações)
 
-> Seu Nome
->
-> Nome do recrutador
->
-> Link do repositório
->
-> Link do Linkedin
+## Tecnologias
 
-### Sobre o ambiente da aplicação:
+- **Kotlin** - Linguagem de programação
+- **Spring Boot** - Framework principal
+- **Spring WebFlux** - Para programação reativa
+- **Spring Data R2DBC** - Para acesso a dados reativo
+- **H2 Database** - Banco de dados em memória
+- **Maven** - Gerenciador de dependências
+- **Swagger/OpenAPI** - Documentação da API
+- **WebClient** - Cliente HTTP para chamadas externas
 
-- Escolha qualquer framework que se sinta **confortável** em trabalhar. Esse teste **não faz** nenhuma preferência,
-  portanto decida por aquele com o qual estará mais seguro em apresentar e conversar com a gente na entrevista ;)
+## Como Executar
 
-- Você pode, inclusive, não optar por framework nenhum. Neste caso, recomendamos a implementação do serviço via script
-  para diminuir a sobrecarga de criar um servidor web;
+### Pré-requisitos
 
-- Ainda assim, se optar por um framework tente evitar usar muito métodos mágicos ou atalhos já prontos. Sabemos que
-  essas facilidades aumentam a produtividade no dia-a-dia mas aqui queremos ver o **seu** código e a sua forma de
-  resolver problemas;
+- Java 21
+- Maven
 
-> Valorizamos uma boa estrutura de containeres criada por você.
+### Passos para execução
 
-## Para o dia da entrevista técnica
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/Borriguel/desafio-backend-banco
+   ```
 
-Na data marcada pelo recrutador tenha sua aplicação rodando na sua máquina local para execução dos testes e para nos
-mostrar os pontos desenvolvidos e possíveis questionamentos.
-Faremos um code review junto contigo como se você já fosse do nosso time :heart:, você poderá explicar o que você
-pensou, como arquitetou e como pode evoluir o projeto.
+2. Navegue até o diretório do projeto:
+   ```bash
+   cd desafio-backend-banco
+   ```
 
-## Objetivo: PicPay Simplificado
+3. Execute o projeto:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
-O PicPay Simplificado é uma plataforma de pagamentos simplificada. Nela é possível depositar e realizar transferências
-de dinheiro entre usuários. Temos 2 tipos de usuários, os comuns e lojistas, ambos têm carteira com dinheiro e realizam
-transferências entre eles.
+4. Acesse a documentação da API:
+   ```
+   http://localhost:8080/swagger-ui.html
+   ```
 
-### Requisitos
+### Banco de Dados
 
-A seguir estão algumas regras de negócio que são importantes para o funcionamento do PicPay Simplificado:
+O projeto utiliza o banco de dados H2 em memória.
 
-- Para ambos tipos de usuário, precisamos do `Nome Completo`, `CPF`, `e-mail` e `Senha`. CPF/CNPJ e e-mails devem ser
-  únicos no sistema. Sendo assim, seu sistema deve permitir apenas um cadastro com o mesmo CPF ou endereço de e-mail;
+## Modelos de Domínio
 
-- Usuários podem enviar dinheiro (efetuar transferência) para lojistas e entre usuários;
+### Client
 
-- Lojistas **só recebem** transferências, não enviam dinheiro para ninguém;
+Representa um cliente do banco.
 
-- Validar se o usuário tem saldo antes da transferência;
+- `id: Long` - Identificador único
+- `email: String` - Email do cliente
+- `name: String` - Nome do cliente
+- `document: String` - Documento (CPF) do cliente
+- `password: String` - Senha do cliente
+- `walletId: Long` - ID da carteira associada
 
-- Antes de finalizar a transferência, deve-se consultar um serviço autorizador externo, use este mock
-  [https://util.devi.tools/api/v2/authorize](https://util.devi.tools/api/v2/authorize) para simular o serviço
-  utilizando o verbo `GET`;
+### Wallet
 
-- A operação de transferência deve ser uma transação (ou seja, revertida em qualquer caso de inconsistência) e o
-  dinheiro deve voltar para a carteira do usuário que envia;
+Representa a carteira de um cliente.
 
-- No recebimento de pagamento, o usuário ou lojista precisa receber notificação (envio de email, sms) enviada por um
-  serviço de terceiro e eventualmente este serviço pode estar indisponível/instável. Use este mock
-  [https://util.devi.tools/api/v1/notify)](https://util.devi.tools/api/v1/notify)) para simular o envio da notificação
-  utilizando o verbo `POST`;
+- `id: Long` - Identificador único
+- `balance: BigDecimal` - Saldo da carteira
+- `type: AccountType` - Tipo da conta (COMMON ou SHOPKEEPER)
 
-- Este serviço deve ser RESTFul.
+### Transaction
 
-> Tente ser o mais aderente possível ao que foi pedido, mas não se preocupe se não conseguir atender a todos os
-> requisitos. Durante a entrevista vamos conversar sobre o que você conseguiu fazer e o que não conseguiu.
+Representa uma transação financeira entre carteiras.
 
-### Endpoint de transferência
+- `id: Long` - Identificador único
+- `payerId: Long` - ID da carteira do pagador
+- `payeeId: Long` - ID da carteira do recebedor
+- `value: BigDecimal` - Valor da transação
+- `idempotencyKey: String` - Chave para evitar transações duplicadas
+- `status: Status` - Status da transação (CREATED, PROCESSING, AUTHORIZED, FAILED)
+- `createdAt: LocalDateTime` - Data de criação
+- `processedAt: LocalDateTime?` - Data de processamento
+- `authorizedAt: LocalDateTime?` - Data de autorização
+- `failedAt: LocalDateTime?` - Data de falha
 
-Você pode implementar o que achar conveniente, porém vamos nos atentar **somente** ao fluxo de transferência entre dois
-usuários. A implementação deve seguir o contrato abaixo.
+### Enums
 
-```http request
-POST /transfer
-Content-Type: application/json
+#### AccountType
+- `COMMON` - Conta comum de pessoa física
+- `SHOPKEEPER` - Conta de lojista
 
+#### Status
+- `CREATED` - Transação criada
+- `PROCESSING` - Transação em processamento
+- `AUTHORIZED` - Transação autorizada
+- `FAILED` - Transação falhou
+
+## Regras de Negócio
+
+1. **Clientes**
+   - O email deve ser válido
+   - A senha deve ter no mínimo 6 caracteres
+   - O nome deve ter entre 3 e 100 caracteres
+   - O documento deve ter exatamente 11 dígitos numéricos
+   - Não podem existir dois clientes com o mesmo email ou documento
+
+2. **Carteiras**
+   - O saldo inicial não pode ser negativo
+   - O valor de depósitos e saques deve ser maior que zero
+   - Contas do tipo SHOPKEEPER não podem realizar transações (apenas receber)
+
+3. **Transações**
+   - O pagador e recebedor devem ser diferentes
+   - O valor da transação deve ser maior que zero
+   - A chave de idempotência não pode estar em branco
+   - Uma transação com a mesma chave de idempotência não será criada novamente
+   - O pagador deve ter saldo suficiente para realizar a transação
+   - Transações são processadas de forma assíncrona com agendamento automático
+
+4. **Processamento de Transações**
+   - Transações criadas são processadas a cada 15 segundos
+   - É feita uma chamada a um serviço externo de autorização
+   - Se a autorização for bem-sucedida, a transação é concluída
+   - Se houver falha, o sistema tenta novamente por até 3 vezes com backoff exponencial
+
+## Rotas da API
+
+### Clientes
+
+#### Criar cliente
+```
+POST /clients
+```
+
+**Corpo da requisição:**
+```json
 {
-  "value": 100.0,
-  "payer": 4,
-  "payee": 15
+  "email": "cliente@example.com",
+  "password": "senha123",
+  "name": "Nome do Cliente",
+  "document": "12345678900",
+  "accountType": "COMMON"
 }
 ```
 
-Caso ache interessante, faça uma **proposta** de endpoint e apresente para os entrevistadores :heart:
-
-# Avaliação
-
-Apresente sua solução utilizando o framework que você desejar, justificando a escolha.
-Atente-se a cumprir a maioria dos requisitos, pois você pode cumprir-los parcialmente e durante a avaliação vamos bater
-um papo a respeito do que faltou.
-
-## O que será avaliado e valorizamos :heart:
-
-Habilidades básicas de criação de projetos backend:
-- Conhecimentos sobre REST
-- Uso do Git
-- Capacidade analítica
-- Apresentação de código limpo e organizado
-
-Conhecimentos intermediários de construção de projetos manuteníveis:
-- Aderência a recomendações de implementação como as PSRs
-- Aplicação e conhecimentos de SOLID
-- Identificação e aplicação de Design Patterns
-- Noções de funcionamento e uso de Cache
-- Conhecimentos sobre conceitos de containers (Docker, Podman etc)
-- Documentação e descrição de funcionalidades e manuseio do projeto
-- Implementação e conhecimentos sobre testes de unidade e integração
-- Identificar e propor melhorias
-- Boas noções de bancos de dados relacionais
-
-Aptidões para criar e manter aplicações de alta qualidade:
-- Aplicação de conhecimentos de observabilidade
-- Utlização de CI para rodar testes e análises estáticas
-- Conhecimentos sobre bancos de dados não-relacionais
-- Aplicação de arquiteturas (CQRS, Event-sourcing, Microsserviços, Monolito modular)
-- Uso e implementação de mensageria
-- Noções de escalabilidade
-- Boas habilidades na aplicação do conhecimento do negócio no software
-- Implementação margeada por ferramentas de qualidade (análise estática, PHPMD, PHPStan, PHP-CS-Fixer etc)
-- Noções de PHP assíncrono
-
-### Boas práticas
-
-Caso use PHP tente seguir as [PSRs](https://www.php-fig.org/psr/psr-12/), caso use outro framework ou linguagem, tente
-seguir as boas práticas da comunidade.
-
-Uma sugestão para revisar a qualidade do seu código é usar ferramentas como o PHPMD antes de submeter o seu teste.
-O comando a seguir pode ser usado para rodar o PHPMD no seu projeto localmente, por exemplo:
-```bash
-docker run -it --rm -v $(pwd):/project -w /project jakzal/phpqa phpmd app text cleancode,codesize,controversial,design,naming,unusedcode
+**Resposta de sucesso:**
+```json
+{
+  "id": 1,
+  "email": "cliente@example.com",
+  "name": "Nome do Cliente",
+  "document": "12345678900",
+  "walletId": 1
+}
 ```
 
-## O que NÃO será avaliado :warning:
+#### Buscar cliente por ID
+```
+GET /clients/{id}
+```
 
-- Fluxo de cadastro de usuários e lojistas
-- Frontend (só avaliaremos a (API Restful)[https://www.devmedia.com.br/rest-tutorial/28912])
-- Autenticação
+**Resposta de sucesso:**
+```json
+{
+  "id": 1,
+  "email": "cliente@example.com",
+  "name": "Nome do Cliente",
+  "document": "12345678900",
+  "walletId": 1
+}
+```
 
-## O que será um Diferencial
+#### Detalhes do cliente
+```
+GET /clients/details/{id}
+```
 
-- Uso de Docker
-- Uma cobertura de testes consistente
-- Uso de Design Patterns
-- Documentação
-- Proposta de melhoria na arquitetura
-- Ser consistente e saber argumentar suas escolhas
-- Apresentar soluções que domina
-- Modelagem de Dados
-- Manutenibilidade do Código
-- Tratamento de erros
-- Cuidado com itens de segurança
-- Arquitetura (estruturar o pensamento antes de escrever)
-- Carinho em desacoplar componentes (outras camadas, service, repository)
+**Resposta de sucesso:**
+```json
+{
+  "id": 1,
+  "name": "Nome do Cliente",
+  "document": "12345678900",
+  "wallet": {
+    "id": 1,
+    "balance": 0,
+    "type": "COMMON"
+  }
+}
+```
 
-## Materiais úteis
+#### Listar todos os clientes
+```
+GET /clients
+```
 
-- https://picpay.com/site/sobre-nos
-- https://hub.packtpub.com/why-we-need-design-patterns/
-- https://refactoring.guru/
-- http://br.phptherightway.com/
-- https://www.php-fig.org/psr/psr-12/
-- https://www.atlassian.com/continuous-delivery/software-testing/types-of-software-testing
-- https://github.com/exakat/php-static-analysis-tools
-- https://martinfowler.com/articles/microservices.html
-- https://docs.guzzlephp.org/en/stable/request-options.html
-- https://www.devmedia.com.br/rest-tutorial/28912
+**Resposta de sucesso:**
+```json
+[
+  {
+    "id": 1,
+    "email": "cliente@example.com",
+    "name": "Nome do Cliente",
+    "document": "12345678900",
+    "walletId": 1
+  }
+]
+```
+
+#### Atualizar cliente
+```
+PUT /clients/{id}
+```
+
+**Corpo da requisição:**
+```json
+{
+  "email": "novoemail@example.com",
+  "password": "novasenha123",
+  "name": "Novo Nome",
+  "document": "09876543211",
+  "accountType": "COMMON"
+}
+```
+
+**Resposta de sucesso:**
+```json
+{
+  "id": 1,
+  "email": "novoemail@example.com",
+  "name": "Novo Nome",
+  "document": "09876543211",
+  "walletId": 1
+}
+```
+
+#### Excluir cliente
+```
+DELETE /clients/{id}
+```
+
+### Carteiras
+
+#### Buscar carteira por ID
+```
+GET /wallets/{id}
+```
+
+**Resposta de sucesso:**
+```json
+{
+  "id": 1,
+  "balance": 100.50,
+  "type": "COMMON"
+}
+```
+
+#### Depositar em carteira
+```
+POST /wallets/{id}/deposit
+```
+
+**Corpo da requisição:**
+```json
+{
+  "amount": 50.75
+}
+```
+
+**Resposta de sucesso:**
+```json
+{
+  "id": 1,
+  "balance": 151.25,
+  "type": "COMMON"
+}
+```
+
+#### Sacar da carteira
+```
+POST /wallets/{id}/withdraw
+```
+
+**Corpo da requisição:**
+```json
+{
+  "amount": 25.50
+}
+```
+
+**Resposta de sucesso:**
+```json
+{
+  "id": 1,
+  "balance": 125.75,
+  "type": "COMMON"
+}
+```
+
+### Transações
+
+#### Criar transação
+```
+POST /transactions
+```
+
+**Corpo da requisição:**
+```json
+{
+  "payerId": 1,
+  "payeeId": 2,
+  "value": 100.00,
+  "idempotencyKey": "chave-única-de-transacao"
+}
+```
+
+**Resposta de sucesso:**
+```json
+{
+  "id": 1,
+  "payerId": 1,
+  "payeeId": 2,
+  "value": 100.00,
+  "idempotencyKey": "chave-única-de-transacao",
+  "status": "CREATED",
+  "createdAt": "2023-01-01T10:00:00"
+}
+```
+
+#### Buscar transação por ID
+```
+GET /transactions/{id}
+```
+
+**Resposta de sucesso:**
+```json
+{
+  "id": 1,
+  "payerId": 1,
+  "payeeId": 2,
+  "value": 100.00,
+  "idempotencyKey": "chave-única-de-transacao",
+  "status": "AUTHORIZED",
+  "createdAt": "2023-01-01T10:00:00",
+  "authorizedAt": "2023-01-01T10:00:05"
+}
+```
+
+#### Listar transações por pagador
+```
+GET /transactions/wallet/payer/{payerId}
+```
+
+**Resposta de sucesso:**
+```json
+[
+  {
+    "id": 1,
+    "payerId": 1,
+    "payeeId": 2,
+    "value": 100.00,
+    "idempotencyKey": "chave-única-de-transacao",
+    "status": "AUTHORIZED",
+    "createdAt": "2023-01-01T10:00:00",
+    "authorizedAt": "2023-01-01T10:00:05"
+  }
+]
+```
+
+#### Listar transações por recebedor
+```
+GET /transactions/wallet/payee/{payeeId}
+```
+
+**Resposta de sucesso:**
+```json
+[
+  {
+    "id": 1,
+    "payerId": 1,
+    "payeeId": 2,
+    "value": 100.00,
+    "idempotencyKey": "chave-única-de-transacao",
+    "status": "AUTHORIZED",
+    "createdAt": "2023-01-01T10:00:00",
+    "authorizedAt": "2023-01-01T10:00:05"
+  }
+]
+```
