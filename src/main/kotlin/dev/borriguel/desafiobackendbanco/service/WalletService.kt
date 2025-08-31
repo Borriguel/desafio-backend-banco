@@ -1,5 +1,6 @@
 package dev.borriguel.desafiobackendbanco.service
 
+import dev.borriguel.desafiobackendbanco.exception.NotFoundException
 import dev.borriguel.desafiobackendbanco.model.AccountType
 import dev.borriguel.desafiobackendbanco.model.Wallet
 import dev.borriguel.desafiobackendbanco.repository.WalletRepository
@@ -17,7 +18,7 @@ class WalletService(private val repository: WalletRepository) {
     }
 
     suspend fun getById(id: Long) : Wallet {
-        return repository.findById(id) ?: throw IllegalArgumentException("Wallet not found")
+        return repository.findById(id) ?: throw NotFoundException("Wallet not found")
     }
 
     @Transactional
