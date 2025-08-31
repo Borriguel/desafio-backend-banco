@@ -40,6 +40,7 @@ class ClientService(private val repository: ClientRepository, private val wallet
         return repository.existsByDocument(document)
     }
 
+    @Transactional
     suspend fun deleteById(id: Long) {
         getById(id)
         repository.deleteById(id)
